@@ -1,5 +1,5 @@
 import { NavigationContainer } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -16,16 +16,15 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import BottomBar from "./BottomBar";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faBars,
   faFilter,
-  faLocationDot,
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
-import { TextInput } from "react-native-paper";
+import HostelScrollCardHome from "./HostelScrollCardHome";
+import axios from "axios";
 
 const { width, height } = Dimensions.get("window");
 
@@ -41,6 +40,8 @@ const normalize = (size) => {
 };
 
 const HomeScreen = ({ navigation }) => {
+  const [hostel_data, setHostelData] = useState([]);
+
   const hideBottomBarAnim = new Animated.Value(15);
 
   const hideBottomBar = (e) => {
@@ -59,9 +60,20 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  const goDetail = () => {
-    navigation.navigate("Details");
-  };
+  const hostelData  = () =>{
+    axios.get('http://192.168.29.198:8000/hostels')
+    .then((data)=>{
+      setHostelData(data.data);
+      // console.log(data.data);
+    })
+    .catch(()=>{
+      console.log("Error occur");
+    })
+  }
+
+  useEffect(()=>{
+    hostelData();
+  },[])
 
   return (
     <>
@@ -116,68 +128,13 @@ const HomeScreen = ({ navigation }) => {
                 snapToAlignment="center"
                 overScrollMode="never"
               >
-                <TouchableOpacity
-                  style={styles.hostelCard}
-                  onPress={() => goDetail()}
-                >
-                  <View style={styles.hostelImageContainer}>
-                    <Image
-                      style={styles.hostelImage}
-                      source={require("../assets/hostel_1.jpg")}
-                    />
-                    <View style={styles.heartContainer}>
-                      <Text style={styles.heartIcon}>H</Text>
-                    </View>
-                  </View>
-                  <View style={styles.hostelDescription}>
-                    <Text style={styles.hostelDescriptionText}>
-                      Dreams Luxury Suites
-                    </Text>
-                    <View style={styles.locationPriceContainer}>
-                      <View style={styles.location}>
-                        <FontAwesomeIcon
-                          style={styles.locationImage}
-                          icon={faLocationDot}
-                        />
-                        <Text style={styles.locationText}>Vasad</Text>
-                      </View>
-                      <View style={styles.price}>
-                        <Text style={styles.priceText}>$1890/year</Text>
-                      </View>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.hostelCard}
-                  onPress={() => goDetail()}
-                >
-                  <View style={styles.hostelImageContainer}>
-                    <Image
-                      style={styles.hostelImage}
-                      source={require("../assets/hostel_1.jpg")}
-                    />
-                    <View style={styles.heartContainer}>
-                      <Text style={styles.heartIcon}>H</Text>
-                    </View>
-                  </View>
-                  <View style={styles.hostelDescription}>
-                    <Text style={styles.hostelDescriptionText}>
-                      Dreams Luxury Suites
-                    </Text>
-                    <View style={styles.locationPriceContainer}>
-                      <View style={styles.location}>
-                        <FontAwesomeIcon
-                          style={styles.locationImage}
-                          icon={faLocationDot}
-                        />
-                        <Text style={styles.locationText}>Vasad</Text>
-                      </View>
-                      <View style={styles.price}>
-                        <Text style={styles.priceText}>$1890/year</Text>
-                      </View>
-                    </View>
-                  </View>
-                </TouchableOpacity>
+                {
+                  hostel_data.map((val)=>(
+                    val.hostels.map((hostels,index)=>(
+                      <HostelScrollCardHome  key={index} college_id={val._id} hostel_id={hostels._id} hostel_name={hostels.hostel_name} location={val.location} price={hostels.room_price} />
+                    ))
+                  ))
+                }
               </ScrollView>
             </View>
             <View style={styles.nearBySectionContainer}>

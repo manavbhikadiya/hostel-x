@@ -4,6 +4,7 @@ import HomeScreen from "./HomeScreen";
 import HostelDetailsScreen from "./HostelDetailScreen";
 import LoginScreen from "./LoginScreen";
 import FavouriteScreen from './FavouriteScreen';
+import MapScreen from "./MapScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -29,6 +30,11 @@ const RootStackScreen = () => {
         <Stack.Screen
           name="Favourite"
           component={FavouriteScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Map"
+          component={MapScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

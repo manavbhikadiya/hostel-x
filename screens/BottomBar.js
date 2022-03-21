@@ -17,7 +17,12 @@ import {
 } from "react-native-responsive-screen";
 import { useNavigation } from "@react-navigation/native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faHomeLg,faHeart,faLocationDot,faUser } from "@fortawesome/free-solid-svg-icons";
+import {
+  faHomeLg,
+  faHeart,
+  faLocationDot,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -33,6 +38,11 @@ const BottomBar = (props) => {
   const goFavourite = () => {
     setHomeFocus("fav");
     navigation.navigate("Favourite");
+  };
+
+  const goMap = () => {
+    setHomeFocus("Map");
+    navigation.navigate("Map");
   };
 
   if (props.anim) {
@@ -55,7 +65,7 @@ const BottomBar = (props) => {
               <FontAwesomeIcon style={styles.menuIcon} icon={faHeart} />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={goHome}
+              onPress={goMap}
               style={[styles.tabIcon, styles.focus]}
             >
               <FontAwesomeIcon style={styles.menuIcon} icon={faLocationDot} />
@@ -81,7 +91,7 @@ const BottomBar = (props) => {
             <TouchableOpacity onPress={goFavourite} style={styles.tabIcon}>
               <Text>F</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={goHome} style={styles.tabIcon}>
+            <TouchableOpacity onPress={goMap} style={styles.tabIcon}>
               <Text>H</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={goHome} style={styles.tabIcon}>

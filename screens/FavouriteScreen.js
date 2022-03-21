@@ -1,5 +1,4 @@
-import { NavigationContainer } from "@react-navigation/native";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -16,15 +15,11 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import BottomBar from "./BottomBar";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import {
-  faHomeLg,
-  faHeart,
-  faLocationDot,
-  faUser,
-} from "@fortawesome/free-solid-svg-icons";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
+import LikescreenCard from "./LikescreenCard";
 
 const { width, height } = Dimensions.get("window");
 
@@ -40,6 +35,9 @@ const normalize = (size) => {
 };
 
 const FavouriteScreen = ({ navigation }) => {
+  const user_id = "623816b20ae0b1b1d482b9fc";
+  const [hostel_data, setHostelData] = useState([]);
+
   const hideBottomBarAnim = new Animated.Value(15);
 
   const hideBottomBar = (e) => {
@@ -58,9 +56,21 @@ const FavouriteScreen = ({ navigation }) => {
     }
   };
 
-  const gotoDetail = () => {
-    navigation.navigate("Details");
+
+  const getFavouriteHostel = () => {
+    axios
+      .get(`http://192.168.29.198:8000/getFavouritehostel/${user_id}`)
+      .then((data) => {
+        setHostelData(data.data);
+      })
+      .catch(() => {
+        console.log("Error occur");
+      });
   };
+
+  useEffect(() => {
+    getFavouriteHostel();
+  }, []);
 
   return (
     <>
@@ -76,30 +86,11 @@ const FavouriteScreen = ({ navigation }) => {
             onScroll={hideBottomBar}
             showsVerticalScrollIndicator={false}
           >
-            <TouchableOpacity onPress={() => gotoDetail()}>
-              <View style={styles.nearbyCard}>
-                <View style={styles.heartContainer}>
-                  <FontAwesomeIcon style={styles.heartIcon} icon={faHeart} />
-                </View>
-                <View style={styles.nearbyHostelImageContainer}>
-                  <Image
-                    style={styles.nearbyHostelImageContainer}
-                    source={require("../assets/hostel_1.jpg")}
-                  />
-                </View>
-                <View style={styles.nearBydescription}>
-                  <Text style={styles.hostelName}>Roayal Ambarrukmo</Text>
-                  <View style={styles.priceContainer}>
-                    <Text style={styles.priceText}>$1890 / Year</Text>
-                  </View>
-                  <View style={styles.roomsAvailableContainer}>
-                    <Text style={styles.roomsAvailableText}>
-                      8 Rooms Available
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity>
+            {hostel_data.map((val) =>
+              val.hostels.map((hostels, index) => (
+                <LikescreenCard key={index} college_id={val._id} hostel_id={hostels._id} hostel_name={hostels.hostel_name} price={hostels.room_price} rooms_available={hostels.rooms_available} />
+              ))
+            )}
           </ScrollView>
         </View>
       </View>
@@ -135,64 +126,5 @@ const styles = StyleSheet.create({
     fontSize: normalize(16),
     fontStyle: "normal",
   },
-  nearbyCard: {
-    marginTop: 25,
-    flexDirection: "row",
-    backgroundColor: "#fff",
-    padding: 5,
-    borderRadius: 20,
-  },
-  nearbyHostelImageContainer: {
-    width: wp(30),
-    height: hp(15),
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  nearbyHostelImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 20,
-  },
-  nearBydescription: {
-    width: wp(50),
-    height: hp(10),
-    padding: 10,
-    marginLeft: 10,
-    borderRadius: 20,
-  },
-  hostelName: {
-    fontSize: normalize(16),
-    fontStyle: "normal",
-    color: "#242424",
-    fontWeight: "bold",
-  },
-  priceContainer: {
-    marginTop: 20,
-  },
-  priceText: {
-    fontSize: normalize(14),
-    fontWeight: "bold",
-    color: "#737373",
-  },
-  roomsAvailableContainer: {
-    marginTop: 10,
-  },
-  roomsAvailableText: {
-    color: "#333333",
-  },
-  heartContainer: {
-    width: wp(8),
-    height: wp(8),
-    borderRadius: 50,
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
-    position: "absolute",
-    bottom: 10,
-    right: 10,
-  },
-  heartIcon:{
-    color:"#ff8080"
-  }
+  
 });

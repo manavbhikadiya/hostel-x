@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -25,7 +25,8 @@ import {
   faUserGroup,
   faAngleLeft,
 } from "@fortawesome/free-solid-svg-icons";
-// import {} from '@fortawesome/free-regular-svg-icons';
+import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 
 const { width, height } = Dimensions.get("window");
 
@@ -40,7 +41,12 @@ const normalize = (size) => {
   }
 };
 
-const HostelDetailScreen = ({ navigation }) => {
+const HostelDetailScreen = ({ route }) => {
+  const [hostelDetail, setHostelDetailsData] = useState([]);
+
+  const { college_id, hostel_id } = route.params;
+
+  const navigation = useNavigation();
   const hideBottomBarAnim = new Animated.Value(15);
 
   const hideBottomBar = (e) => {
@@ -59,6 +65,33 @@ const HostelDetailScreen = ({ navigation }) => {
     }
   };
 
+  const getHostelDetails = () => {
+    axios
+      .get(
+        `http://192.168.29.198:8000/getHostelDetails/${college_id}/${hostel_id}`
+      )
+      .then((data) => {
+        setHostelDetailsData(data.data);
+      })
+      .catch(() => {
+        console.log("Error occur");
+      });
+  };
+
+  useEffect(() => {
+    getHostelDetails();
+  }, []);
+
+  const gotoMap = (hostel_id, latitude, longitude, hostel_name, kms) => {
+    navigation.navigate("Map", {
+      hostel_id: hostel_id,
+      latitude: latitude,
+      longitude: longitude,
+      hostel_name: hostel_name,
+      kms: kms,
+    });
+  };
+
   return (
     <>
       <View style={styles.detailsScreenContainer}>
@@ -69,7 +102,10 @@ const HostelDetailScreen = ({ navigation }) => {
           showsVerticalScrollIndicator={false}
           onScroll={hideBottomBar}
         >
-          <TouchableOpacity onPress={()=>navigation.goBack()} style={styles.backButtoncontainer}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButtoncontainer}
+          >
             <FontAwesomeIcon
               style={styles.backIcon}
               icon={faAngleLeft}
@@ -84,11 +120,15 @@ const HostelDetailScreen = ({ navigation }) => {
                 source={require("../assets/hostel_1.jpg")}
               >
                 <BlurView intensity={100} style={styles.hostelDescription}>
-                  <Text style={styles.hostelName}>Dreams Luxury Suites</Text>
+                  <Text style={styles.hostelName}>
+                    {hostelDetail.hostel_name}
+                  </Text>
                   <Text style={styles.hostelLocation}>
                     Santorini Island, Greece
                   </Text>
-                  <Text style={styles.price}>$1890/year</Text>
+                  <Text style={styles.price}>
+                    {hostelDetail.room_price}/year
+                  </Text>
                   <View style={styles.heartContainer}>
                     <FontAwesomeIcon style={styles.heartIcon} icon={faHeart} />
                   </View>
@@ -114,17 +154,36 @@ const HostelDetailScreen = ({ navigation }) => {
               <View style={styles.facilityIcon}>
                 <FontAwesomeIcon style={styles.menuIcon} icon={faHome} />
               </View>
-              <Text style={styles.facilityText}>8 Rooms available</Text>
+              <Text style={styles.facilityText}>
+                {hostelDetail.rooms_available} Rooms available
+              </Text>
             </View>
             <View style={styles.facilityContainer}>
               <View style={styles.facilityIcon}>
                 <FontAwesomeIcon style={styles.menuIcon} icon={faUserGroup} />
               </View>
-              <Text style={styles.facilityText}>Boy's Hostel</Text>
+              {hostelDetail.boys && hostelDetail.girls ? (
+                <Text style={styles.facilityText}>Boy's and Girl's Hostel</Text>
+              ) : hostelDetail.girls ? (
+                <Text style={styles.facilityText}>Girl's Hostel</Text>
+              ) : (
+                <Text style={styles.facilityText}>Boy's Hostel</Text>
+              )}
             </View>
           </View>
           <View style={styles.mapBookButtonContainer}>
-            <TouchableOpacity style={styles.mapButton}>
+            <TouchableOpacity
+              style={styles.mapButton}
+              onPress={() =>
+                gotoMap(
+                  hostelDetail._id,
+                  hostelDetail.latitude,
+                  hostelDetail.longitude,
+                  hostelDetail.hostel_name,
+                  hostelDetail.kms
+                )
+              }
+            >
               <Text style={styles.mapText}>View on Map</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.BookButton}>
