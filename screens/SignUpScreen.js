@@ -98,7 +98,7 @@ const SignUpScreen = ({ navigation }) => {
   return (
     <>
       <View style={styles.container}>
-        <Image source={require("../assets/back.png")} style={styles.image} />
+        <Image source={require("../assets/loginBack.jpg")} style={styles.image} />
         <View style={styles.loginContainer}>
           <Text style={styles.welcomeText}>Register Now</Text>
           <Text style={styles.subText}>Connect with us securely</Text>
@@ -128,7 +128,7 @@ const SignUpScreen = ({ navigation }) => {
               value={password}
             />
             <TouchableOpacity style={styles.LoginTextContainer}>
-              <TouchableOpacity onPress={()=>navigation.navigate('SignUp')}>
+              <TouchableOpacity onPress={()=>navigation.navigate('Login')}>
                 <Text style={styles.loginText}>Already have an Account?</Text>
               </TouchableOpacity>
             </TouchableOpacity>
@@ -232,6 +232,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: width,
     height: height,
+    height: height*1.1,
+    backgroundColor: "rgba(0,0,0,1)",
+    opacity:0.4,
   },
   LoginTextContainer: {
     marginTop: 10,

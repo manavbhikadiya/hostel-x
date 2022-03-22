@@ -83,7 +83,7 @@ const LoginScreen = ({ navigation }) => {
   return (
     <>
       <View style={styles.container}>
-        <Image source={require("../assets/back.png")} style={styles.image} />
+        <Image source={require("../assets/loginBack.jpg")} style={styles.image} />
         <View style={styles.loginContainer}>
           <Text style={styles.welcomeText}>Welcome Back</Text>
           <Text style={styles.subText}>Login to your account</Text>
@@ -207,7 +207,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     position: "absolute",
     width: width,
-    height: height,
+    height: height*1.1,
+    backgroundColor: "rgba(0,0,0,1)",
+    opacity:0.4,
   },
   registerTextContainer: {
     marginTop: 10,
