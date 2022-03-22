@@ -11,7 +11,7 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const fetchUser = async () => {
-    const token = await AsyncStorage.getItem("token");
+    const token = await AsyncStorage.getItem("userToken");
 
     if (token != null) {
       setIsLoggedIn(true);

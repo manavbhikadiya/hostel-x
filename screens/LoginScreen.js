@@ -11,13 +11,15 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Animated,
+  Alert,
 } from "react-native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import axios from "axios";
+import { useDispatch } from "react-redux";
 
 const { width, height } = Dimensions.get("window");
 
@@ -33,15 +35,49 @@ const normalize = (size) => {
 };
 
 const LoginScreen = ({ navigation }) => {
- 
+  const [email, setEmail] = useState(null);
+  const [password, setPassword] = useState(null);
+  const [userId, setUserID] = useState(null);
+  const dispatch = useDispatch();
+
+  const handleEmail = (email) => {
+    setEmail(email);
+  };
+
+  const handlePassword = (password) => {
+    setPassword(password);
+  };
+
   const submitData = () => {
-    AsyncStorage.setItem('token',"hello")
-    .then(()=>{
-      navigation.navigate('Home');
-    })
-    .catch((e)=>{
-      navigation.navigate('Login');
-    })
+    axios
+      .post(`http://localhost:8000/user${email}`, { password: password })
+      .then((res) => {
+        console.log(res.data);
+        setUserID(res.data._id);
+        dispatch(login(res.data._id));
+      })
+      .catch(() => {
+        Alert.alert(
+          "Authenticaion Error",
+          "Unable to login. Please try again later.",
+          [
+            {
+              text: "Cancel",
+              onPress: () => navigation.navigate("Login"),
+              style: "cancel",
+            },
+            { text: "OK", onPress: () => navigation.navigate("Login") },
+          ]
+        );
+      });
+
+    AsyncStorage.setItem("userToken", userId)
+      .then(() => {
+        navigation.navigate("Home");
+      })
+      .catch(() => {
+        navigation.navigate("Login");
+      });
   };
 
   return (
@@ -51,12 +87,23 @@ const LoginScreen = ({ navigation }) => {
           <Text style={styles.welcomeText}>Welcome Back</Text>
           <Text style={styles.subText}>Login to your account</Text>
           <View style={styles.loginFields}>
-            <TextInput style={styles.input} placeholder="Email" />
-            <TextInput style={styles.input} placeholder="Password" />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              onChangeText={(val) => handleEmail(val)}
+              value={email}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              onChangeText={(val) => handlePassword(val)}
+              value={password}
+            />
+            <TouchableOpacity style={styles.registerTextContainer}>
+              <Text style={styles.registerText}>Register Now</Text>
+            </TouchableOpacity>
             <TouchableOpacity onPress={submitData}>
-              <Animated.View
-                style={styles.loginButton}
-              >
+              <Animated.View style={styles.loginButton}>
                 <Text style={styles.signInText}>Sign in</Text>
               </Animated.View>
             </TouchableOpacity>
