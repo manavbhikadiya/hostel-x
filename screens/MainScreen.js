@@ -5,7 +5,7 @@ import HostelDetailsScreen from "./HostelDetailScreen";
 import LoginScreen from "./LoginScreen";
 import FavouriteScreen from './FavouriteScreen';
 import MapScreen from "./MapScreen";
-
+import SignUpScreen from "./SignUpScreen";
 const Stack = createNativeStackNavigator();
 
 const RootStackScreen = () => {
@@ -35,6 +35,11 @@ const RootStackScreen = () => {
         <Stack.Screen
           name="Map"
           component={MapScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SignUp"
+          component={SignUpScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

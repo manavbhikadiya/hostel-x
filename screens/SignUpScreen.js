@@ -34,7 +34,9 @@ const normalize = (size) => {
   }
 };
 
-const LoginScreen = ({ navigation }) => {
+const SignUpScreen = ({ navigation }) => {
+  const [username, setUserName] = useState(null);
+  const [mobile, setMobile] = useState(null);
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   const [userId, setUserID] = useState(null);
@@ -48,10 +50,23 @@ const LoginScreen = ({ navigation }) => {
     setPassword(password);
   };
 
+  const handleuserName = (userName) => {
+    setUserName(userName);
+  };
+
+  const handleMobile = (mobile) => {
+    setMobile(mobile);
+  };
+
   const submitData = () => {
     setIsLoading(true);
     axios
-      .post(`http://192.168.29.198:8000/login/${email}`, { password: password })
+      .post(`http://192.168.29.198:8000/user`, {
+        name: username,
+        email: email,
+        password: password,
+        mobile: mobile,
+      })
       .then((res) => {
         setUserID(res.data._id);
         AsyncStorage.setItem("userToken", userId)
@@ -85,9 +100,15 @@ const LoginScreen = ({ navigation }) => {
       <View style={styles.container}>
         <Image source={require("../assets/back.png")} style={styles.image} />
         <View style={styles.loginContainer}>
-          <Text style={styles.welcomeText}>Welcome Back</Text>
-          <Text style={styles.subText}>Login to your account</Text>
+          <Text style={styles.welcomeText}>Register Now</Text>
+          <Text style={styles.subText}>Connect with us securely</Text>
           <View style={styles.loginFields}>
+            <TextInput
+              style={styles.input}
+              placeholder="Name"
+              onChangeText={(val) => handleuserName(val)}
+              value={username}
+            />
             <TextInput
               style={styles.input}
               placeholder="Email"
@@ -96,16 +117,19 @@ const LoginScreen = ({ navigation }) => {
             />
             <TextInput
               style={styles.input}
+              placeholder="Mobile"
+              onChangeText={(val) => handleMobile(val)}
+              value={mobile}
+            />
+            <TextInput
+              style={styles.input}
               placeholder="Password"
               onChangeText={(val) => handlePassword(val)}
               value={password}
             />
-            <TouchableOpacity style={styles.registerTextContainer}>
-              <TouchableOpacity>
-                <Text style={styles.forgotText}>Forgot Password?</Text>
-              </TouchableOpacity>
+            <TouchableOpacity style={styles.LoginTextContainer}>
               <TouchableOpacity onPress={()=>navigation.navigate('SignUp')}>
-                <Text style={styles.registerText}>Register Now</Text>
+                <Text style={styles.loginText}>Already have an Account?</Text>
               </TouchableOpacity>
             </TouchableOpacity>
             <TouchableOpacity onPress={submitData}>
@@ -115,7 +139,7 @@ const LoginScreen = ({ navigation }) => {
                 </Animated.View>
               ) : (
                 <Animated.View style={styles.loginButton}>
-                  <Text style={styles.signInText}>Sign in</Text>
+                  <Text style={styles.signInText}>Sign Up</Text>
                 </Animated.View>
               )}
             </TouchableOpacity>
@@ -125,7 +149,7 @@ const LoginScreen = ({ navigation }) => {
     </>
   );
 };
-export default LoginScreen;
+export default SignUpScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -138,7 +162,7 @@ const styles = StyleSheet.create({
   loginContainer: {
     backgroundColor: "#fff",
     width: wp(80),
-    height: hp(50),
+    height: hp(60),
     padding: 15,
     borderRadius: 8,
     shadowColor: "#000",
@@ -195,7 +219,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.58,
     shadowRadius: 16.0,
     elevation: 24,
-    marginTop: 50,
+    marginTop: 15,
   },
   signInText: {
     color: "#fff",
@@ -209,7 +233,7 @@ const styles = StyleSheet.create({
     width: width,
     height: height,
   },
-  registerTextContainer: {
+  LoginTextContainer: {
     marginTop: 10,
     display: "flex",
     flexDirection: "row",
@@ -218,9 +242,8 @@ const styles = StyleSheet.create({
   forgotText: {
     color: "#000",
   },
-  registerText: {
+  loginText: {
     color: "#ef5742",
     fontWeight: "bold",
-    marginLeft: 50,
   },
 });

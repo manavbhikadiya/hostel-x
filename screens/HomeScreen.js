@@ -25,6 +25,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import HostelScrollCardHome from "./HostelScrollCardHome";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -75,6 +76,11 @@ const HomeScreen = ({ navigation }) => {
     hostelData();
   },[])
 
+  const logout = async () =>{
+      await AsyncStorage.clear();
+      navigation.navigate('Login');
+  } 
+
   return (
     <>
       <View style={styles.HomeScreenContainer}>
@@ -85,7 +91,7 @@ const HomeScreen = ({ navigation }) => {
           overScrollMode="never"
         >
           <View style={styles.header}>
-            <TouchableOpacity style={styles.menuIconContainer}>
+            <TouchableOpacity style={styles.menuIconContainer} onPress={()=>logout()}>
               <FontAwesomeIcon style={styles.menuIcon} icon={faBars} />
             </TouchableOpacity>
             <Animated.View style={styles.profile}>
