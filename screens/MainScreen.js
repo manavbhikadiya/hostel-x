@@ -7,48 +7,53 @@ import FavouriteScreen from './FavouriteScreen';
 import MapScreen from "./MapScreen";
 import SignUpScreen from "./SignUpScreen";
 import ForgotPassword from "./ForgotPassword";
-const Stack = createNativeStackNavigator();
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import DrawerContent from "./DrawerContent";
+
+const Drawer = createDrawerNavigator();
 
 const RootStackScreen = () => {
   return (
     
-      <Stack.Navigator>
-        <Stack.Screen
+      <Drawer.Navigator
+      drawerContent={props=>(<DrawerContent {...props} />)}
+      >
+        <Drawer.Screen
           name="Home"
           component={HomeScreen}
           options={{ headerShown: false }}
         />
-        <Stack.Screen
-          name="Details"
-          component={HostelDetailsScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Login"
-          component={LoginScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Favourite"
-          component={FavouriteScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Map"
-          component={MapScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="SignUp"
-          component={SignUpScreen}
-          options={{ headerShown: false }}
-        />
-         <Stack.Screen
-          name="ForgotPassword"
-          component={ForgotPassword}
-          options={{ headerShown: false }}
-        />
-      </Stack.Navigator>
+        <Drawer.Screen
+        name="Details"
+        component={HostelDetailsScreen}
+        options={{ headerShown: false }}
+      />
+      <Drawer.Screen
+        name="Favourite"
+        component={FavouriteScreen}
+        options={{ headerShown: false }}
+      />
+      <Drawer.Screen
+        name="Map"
+        component={MapScreen}
+        options={{ headerShown: false }}
+      />
+      <Drawer.Screen
+        name="SignUp"
+        component={SignUpScreen}
+        options={{ headerShown: false }}
+      />
+      <Drawer.Screen
+        name="ForgotPassword"
+        component={ForgotPassword}
+        options={{ headerShown: false }}
+      />
+      <Drawer.Screen
+        name="Login"
+        component={LoginScreen}
+        options={{ headerShown: false }}
+      />
+      </Drawer.Navigator>
   );
 };
 

@@ -23,7 +23,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faBars, faFilter, faSearch } from "@fortawesome/free-solid-svg-icons";
 import HostelScrollCardHome from "./HostelScrollCardHome";
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSelector } from "react-redux";
 
 const { width, height } = Dimensions.get("window");
@@ -89,10 +88,7 @@ const HomeScreen = ({ navigation }) => {
     hostelData();
   }, []);
 
-  const logout = async () => {
-    await AsyncStorage.clear();
-    navigation.navigate("Login");
-  };
+
 
   return (
     <>
@@ -106,7 +102,7 @@ const HomeScreen = ({ navigation }) => {
           <View style={styles.header}>
             <TouchableOpacity
               style={styles.menuIconContainer}
-              onPress={() => logout()}
+              onPress={() => navigation.openDrawer()}
             >
               <FontAwesomeIcon style={styles.menuIcon} icon={faBars} />
             </TouchableOpacity>
