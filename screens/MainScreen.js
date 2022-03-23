@@ -6,6 +6,7 @@ import LoginScreen from "./LoginScreen";
 import FavouriteScreen from './FavouriteScreen';
 import MapScreen from "./MapScreen";
 import SignUpScreen from "./SignUpScreen";
+import ForgotPassword from "./ForgotPassword";
 const Stack = createNativeStackNavigator();
 
 const RootStackScreen = () => {
@@ -40,6 +41,11 @@ const RootStackScreen = () => {
         <Stack.Screen
           name="SignUp"
           component={SignUpScreen}
+          options={{ headerShown: false }}
+        />
+         <Stack.Screen
+          name="ForgotPassword"
+          component={ForgotPassword}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

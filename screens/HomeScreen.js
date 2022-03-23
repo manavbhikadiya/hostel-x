@@ -11,6 +11,8 @@ import {
   Platform,
   TouchableOpacity,
   Animated,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -18,14 +20,11 @@ import {
 } from "react-native-responsive-screen";
 import BottomBar from "./BottomBar";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import {
-  faBars,
-  faFilter,
-  faSearch,
-} from "@fortawesome/free-solid-svg-icons";
+import { faBars, faFilter, faL, faSearch } from "@fortawesome/free-solid-svg-icons";
 import HostelScrollCardHome from "./HostelScrollCardHome";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSelector } from "react-redux";
 
 const { width, height } = Dimensions.get("window");
 
@@ -42,7 +41,8 @@ const normalize = (size) => {
 
 const HomeScreen = ({ navigation }) => {
   const [hostel_data, setHostelData] = useState([]);
-
+  const [isLoading, setIsLoading] = useState(false);
+  const initialState = useSelector(state => state.loginReducer);
   const hideBottomBarAnim = new Animated.Value(15);
 
   const hideBottomBar = (e) => {
@@ -61,25 +61,38 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  const hostelData  = () =>{
-    axios.get('http://192.168.29.198:8000/hostels')
-    .then((data)=>{
-      setHostelData(data.data);
-      // console.log(data.data);
-    })
-    .catch(()=>{
-      console.log("Error occur");
-    })
-  }
+  const hostelData = () => {
+    setIsLoading(true);
+    axios
+      .get("http://192.168.29.198:8000/hostels")
+      .then((data) => {
+        setHostelData(data.data);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        Alert.alert(
+          "Error occur",
+          "Response timed out. Check your internet connection",
+          [
+            {
+              text: "Cancel",
+              onPress: () => {setIsLoading(false)},
+              style: "cancel",
+            },
+            { text: "OK", onPress: () => {setIsLoading(false)} },
+          ]
+        );
+      });
+  };
 
-  useEffect(()=>{
+  useEffect(() => {
     hostelData();
-  },[])
+  }, []);
 
-  const logout = async () =>{
-      await AsyncStorage.clear();
-      navigation.navigate('Login');
-  } 
+  const logout = async () => {
+    await AsyncStorage.clear();
+    navigation.navigate("Login");
+  };
 
   return (
     <>
@@ -91,7 +104,10 @@ const HomeScreen = ({ navigation }) => {
           overScrollMode="never"
         >
           <View style={styles.header}>
-            <TouchableOpacity style={styles.menuIconContainer} onPress={()=>logout()}>
+            <TouchableOpacity
+              style={styles.menuIconContainer}
+              onPress={() => logout()}
+            >
               <FontAwesomeIcon style={styles.menuIcon} icon={faBars} />
             </TouchableOpacity>
             <Animated.View style={styles.profile}>
@@ -104,7 +120,7 @@ const HomeScreen = ({ navigation }) => {
           <View style={styles.screenBody}>
             <View style={styles.screenBodyTop}>
               <View style={styles.titles}>
-                <Text style={styles.greet}>Hi, Niara</Text>
+                <Text style={styles.greet}>Hi, {initialState.userData.name}</Text>
                 <Text style={styles.screenHeading}>
                   Enjoy your Staying with us
                 </Text>
@@ -126,22 +142,31 @@ const HomeScreen = ({ navigation }) => {
               </View>
             </View>
             <View style={styles.hostelsListContainer}>
-              <ScrollView
-                horizontal={true}
-                endFillColor="#fcfbfe"
-                indicatorStyle="black"
-                showsHorizontalScrollIndicator={false}
-                snapToAlignment="center"
-                overScrollMode="never"
-              >
-                {
-                  hostel_data.map((val)=>(
-                    val.hostels.map((hostels,index)=>(
-                      <HostelScrollCardHome  key={index} college_id={val._id} hostel_id={hostels._id} hostel_name={hostels.hostel_name} location={val.location} price={hostels.room_price} />
+              {isLoading ? (
+                <ActivityIndicator color="#ef5742" size={40} />
+              ) : (
+                <ScrollView
+                  horizontal={true}
+                  endFillColor="#fcfbfe"
+                  indicatorStyle="black"
+                  showsHorizontalScrollIndicator={false}
+                  snapToAlignment="center"
+                  overScrollMode="never"
+                >
+                  {hostel_data.map((val) =>
+                    val.hostels.map((hostels, index) => (
+                      <HostelScrollCardHome
+                        key={index}
+                        college_id={val._id}
+                        hostel_id={hostels._id}
+                        hostel_name={hostels.hostel_name}
+                        location={val.location}
+                        price={hostels.room_price}
+                      />
                     ))
-                  ))
-                }
-              </ScrollView>
+                  )}
+                </ScrollView>
+              )}
             </View>
             <View style={styles.nearBySectionContainer}>
               <View style={styles.NearByViewAll}>

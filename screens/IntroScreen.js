@@ -6,12 +6,21 @@ import {
   TouchableOpacity,
   Dimensions,
   Image,
+  Animated,
 } from "react-native";
+import * as Animatable from "react-native-animatable";
 
 const { width, height } = Dimensions.get("window");
 
 const IntroScreen = ({ navigation }) => {
+  const exploreAnimationWidth = new Animated.Value(150);
+
   const goHome = () => {
+    Animated.timing(exploreAnimationWidth, {
+      toValue: width,
+      duration: 500,
+      useNativeDriver: false,
+    }).start();
     navigation.navigate("Login");
   };
 
@@ -23,9 +32,18 @@ const IntroScreen = ({ navigation }) => {
         <Text style={styles.pageHeading}>
           Find the best place to stay for you.
         </Text>
-        <TouchableOpacity style={styles.homeButton} onPress={() => goHome()}>
-          <Text style={styles.buttonText}>Explore Now</Text>
-        </TouchableOpacity>
+        <Animatable.View animation="fadeInRight">
+          <Animated.View
+            style={[
+              styles.homeButton,
+              { width: exploreAnimationWidth },
+            ]}
+          >
+            <TouchableOpacity onPress={() => goHome()}>
+              <Text style={styles.buttonText}>Explore Now</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </Animatable.View>
       </View>
     </>
   );
@@ -37,7 +55,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 30,
     paddingVertical: 50,
-    backgroundColor:"#fff"
+    backgroundColor: "#fff",
   },
   greet: {
     marginTop: 70,
@@ -71,7 +89,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: width,
     height: height,
-    opacity:0.5,
-    marginTop:height/5
+    opacity: 0.5,
+    marginTop: height / 5,
   },
 });

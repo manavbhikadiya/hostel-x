@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   Text,
@@ -19,8 +20,8 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
 import * as Animatable from "react-native-animatable";
+import axios from "axios";
 import { useDispatch } from "react-redux";
 import { login } from "./redux/actions/index";
 
@@ -37,12 +38,11 @@ const normalize = (size) => {
   }
 };
 
-const SignUpScreen = ({ navigation }) => {
-  const [username, setUserName] = useState(null);
-  const [mobile, setMobile] = useState(null);
+const ForgotPassword = ({ navigation }) => {
   const [email, setEmail] = useState(null);
-  const [password, setPassword] = useState(null);
+  const [isTextVisible, setIsTextVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
   const dispatch = useDispatch();
 
   const handleEmail = (email) => {
@@ -53,35 +53,24 @@ const SignUpScreen = ({ navigation }) => {
     setPassword(password);
   };
 
-  const handleuserName = (userName) => {
-    setUserName(userName);
-  };
-
-  const handleMobile = (mobile) => {
-    setMobile(mobile);
-  };
-
   const submitData = () => {
     setIsLoading(true);
     axios
-      .post(`http://192.168.29.198:8000/user`, {
-        name: username,
-        email: email,
-        password: password,
-        mobile: mobile,
-      })
+      .post(`http://192.168.29.198:8000/login/${email}`, { password: password })
       .then((res) => {
         if (res) {
           setTimeout(() => {
-            dispatch(login(res.data));
             AsyncStorage.setItem("userToken", res.data._id)
               .then(() => {
+                dispatch(login(res.data));
                 navigation.navigate("Home");
               })
               .catch(() => {
                 navigation.navigate("Login");
               });
             setIsLoading(false);
+            setPassword(null);
+            setEmail(null);
           }, 3000);
         }
       })
@@ -92,10 +81,10 @@ const SignUpScreen = ({ navigation }) => {
           [
             {
               text: "Cancel",
-              onPress: () => navigation.navigate("SignUp"),
+              onPress: () => navigation.navigate("Login"),
               style: "cancel",
             },
-            { text: "OK", onPress: () => navigation.navigate("SignUp") },
+            { text: "OK", onPress: () => navigation.navigate("Login") },
           ]
         );
         setIsLoading(false);
@@ -109,39 +98,18 @@ const SignUpScreen = ({ navigation }) => {
           source={require("../assets/loginBack.jpg")}
           style={styles.image}
         />
-        <Animatable.View style={styles.loginContainer} animation="flipInY">
-          <Text style={styles.welcomeText}>Register Now</Text>
-          <Text style={styles.subText}>Connect with us securely</Text>
+        <Animatable.View style={styles.loginContainer} animation="flipInX">
+          <Text style={styles.welcomeText}>Forgot Password</Text>
           <View style={styles.loginFields}>
-            <TextInput
-              style={styles.input}
-              placeholder="Name"
-              onChangeText={(val) => handleuserName(val)}
-              value={username}
-            />
             <TextInput
               style={styles.input}
               placeholder="Email"
               onChangeText={(val) => handleEmail(val)}
               value={email}
             />
-            <TextInput
-              style={styles.input}
-              placeholder="Mobile"
-              onChangeText={(val) => handleMobile(val)}
-              value={mobile}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Password"
-              onChangeText={(val) => handlePassword(val)}
-              value={password}
-            />
-            <TouchableOpacity style={styles.LoginTextContainer}>
-              <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-                <Text style={styles.loginText}>Already have an Account?</Text>
-              </TouchableOpacity>
-            </TouchableOpacity>
+            {
+                isTextVisible?(<Text style={styles.sentText}>Password sent successfully</Text>):(null)
+            }
             <TouchableOpacity onPress={submitData}>
               {isLoading ? (
                 <Animated.View style={styles.loginButton}>
@@ -149,7 +117,7 @@ const SignUpScreen = ({ navigation }) => {
                 </Animated.View>
               ) : (
                 <Animated.View style={styles.loginButton}>
-                  <Text style={styles.signInText}>Sign Up</Text>
+                  <Text style={styles.signInText}>Send Password</Text>
                 </Animated.View>
               )}
             </TouchableOpacity>
@@ -159,7 +127,7 @@ const SignUpScreen = ({ navigation }) => {
     </>
   );
 };
-export default SignUpScreen;
+export default ForgotPassword;
 
 const styles = StyleSheet.create({
   container: {
@@ -172,7 +140,7 @@ const styles = StyleSheet.create({
   loginContainer: {
     backgroundColor: "#fff",
     width: wp(80),
-    height: hp(60),
+    height: hp(40),
     padding: 15,
     borderRadius: 8,
     shadowColor: "#000",
@@ -213,6 +181,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     color: "#737373",
   },
+  sentText:{
+      color:"#ef5742"
+  },
   loginButton: {
     width: wp(60),
     height: hp(4.8),
@@ -229,7 +200,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.58,
     shadowRadius: 16.0,
     elevation: 24,
-    marginTop: 15,
+    marginTop: 50,
   },
   signInText: {
     color: "#fff",
@@ -241,12 +212,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     position: "absolute",
     width: width,
-    height: height,
     height: height * 1.1,
     backgroundColor: "rgba(0,0,0,1)",
     opacity: 0.4,
   },
-  LoginTextContainer: {
+  registerTextContainer: {
     marginTop: 10,
     display: "flex",
     flexDirection: "row",
@@ -255,8 +225,9 @@ const styles = StyleSheet.create({
   forgotText: {
     color: "#000",
   },
-  loginText: {
+  registerText: {
     color: "#ef5742",
     fontWeight: "bold",
+    marginLeft: 50,
   },
 });

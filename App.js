@@ -6,6 +6,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import RootStackScreen from "./screens/RootStackScreen";
 import MainScreen from "./screens/MainScreen";
+import { Provider } from "react-redux";
+import Store from "./screens/redux/store";
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -25,9 +27,11 @@ const App = () => {
   }, []);
 
   return (
-    <NavigationContainer>
-      {isLoggedIn ? <MainScreen /> : <RootStackScreen />}
-    </NavigationContainer>
+    <Provider store={Store}>
+      <NavigationContainer>
+        {isLoggedIn ? <MainScreen /> : <RootStackScreen />}
+      </NavigationContainer>
+    </Provider>
   );
 };
 

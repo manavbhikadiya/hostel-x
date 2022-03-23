@@ -6,11 +6,9 @@ import {
   View,
   Image,
   Dimensions,
-  ScrollView,
   PixelRatio,
   Platform,
   TouchableOpacity,
-  Animated,
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -19,13 +17,8 @@ import {
 import BottomBar from "./BottomBar";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
-  faBars,
-  faFilter,
-  faSearch,
   faHeart,
 } from "@fortawesome/free-solid-svg-icons";
-import HostelScrollCardHome from "./HostelScrollCardHome";
-import axios from "axios";
 
 const { width, height } = Dimensions.get("window");
 

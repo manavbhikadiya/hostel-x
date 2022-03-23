@@ -19,7 +19,10 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Animatable from "react-native-animatable";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { login } from "./redux/actions/index";
 
 const { width, height } = Dimensions.get("window");
 
@@ -37,8 +40,9 @@ const normalize = (size) => {
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
-  const [userId, setUserID] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const dispatch = useDispatch();
 
   const handleEmail = (email) => {
     setEmail(email);
@@ -53,15 +57,21 @@ const LoginScreen = ({ navigation }) => {
     axios
       .post(`http://192.168.29.198:8000/login/${email}`, { password: password })
       .then((res) => {
-        setUserID(res.data._id);
-        AsyncStorage.setItem("userToken", userId)
-          .then(() => {
-            navigation.navigate("Home");
-          })
-          .catch(() => {
-            navigation.navigate("Login");
-          });
-        setIsLoading(false);
+        if (res) {
+          setTimeout(() => {
+            AsyncStorage.setItem("userToken", res.data._id)
+              .then(() => {
+                dispatch(login(res.data));
+                navigation.navigate("Home");
+              })
+              .catch(() => {
+                navigation.navigate("Login");
+              });
+            setIsLoading(false);
+            setPassword(null);
+            setEmail(null);
+          }, 3000);
+        }
       })
       .catch(() => {
         Alert.alert(
@@ -83,8 +93,11 @@ const LoginScreen = ({ navigation }) => {
   return (
     <>
       <View style={styles.container}>
-        <Image source={require("../assets/loginBack.jpg")} style={styles.image} />
-        <View style={styles.loginContainer}>
+        <Image
+          source={require("../assets/loginBack.jpg")}
+          style={styles.image}
+        />
+        <Animatable.View style={styles.loginContainer} animation="flipInX">
           <Text style={styles.welcomeText}>Welcome Back</Text>
           <Text style={styles.subText}>Login to your account</Text>
           <View style={styles.loginFields}>
@@ -101,10 +114,10 @@ const LoginScreen = ({ navigation }) => {
               value={password}
             />
             <TouchableOpacity style={styles.registerTextContainer}>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={()=>navigation.navigate('ForgotPassword')}>
                 <Text style={styles.forgotText}>Forgot Password?</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={()=>navigation.navigate('SignUp')}>
+              <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
                 <Text style={styles.registerText}>Register Now</Text>
               </TouchableOpacity>
             </TouchableOpacity>
@@ -120,7 +133,7 @@ const LoginScreen = ({ navigation }) => {
               )}
             </TouchableOpacity>
           </View>
-        </View>
+        </Animatable.View>
       </View>
     </>
   );
@@ -207,9 +220,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     position: "absolute",
     width: width,
-    height: height*1.1,
+    height: height * 1.1,
     backgroundColor: "rgba(0,0,0,1)",
-    opacity:0.4,
+    opacity: 0.4,
   },
   registerTextContainer: {
     marginTop: 10,
