@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
+import { faLocationDot,faHeart } from "@fortawesome/free-solid-svg-icons";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -49,7 +49,10 @@ const HostelScrollCardHome = (props) => {
             source={require("../assets/hostel_1.jpg")}
           />
           <View style={styles.heartContainer}>
-            <Text style={styles.heartIcon}>H</Text>
+          <FontAwesomeIcon
+                style={styles.heartImage}
+                icon={faHeart}
+              />
           </View>
         </View>
         <View style={styles.hostelDescription}>
@@ -132,6 +135,9 @@ const styles = StyleSheet.create({
   },
   locationImage: {
     color: "#ef5742",
+  },
+  heartImage:{
+    color: "#000"
   },
   locationText: {
     color: "#bfbfbf",

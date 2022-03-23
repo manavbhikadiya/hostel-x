@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Text,
@@ -22,8 +21,6 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Animatable from "react-native-animatable";
 import axios from "axios";
-import { useDispatch } from "react-redux";
-import { login } from "./redux/actions/index";
 
 const { width, height } = Dimensions.get("window");
 
@@ -43,48 +40,30 @@ const ForgotPassword = ({ navigation }) => {
   const [isTextVisible, setIsTextVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const dispatch = useDispatch();
-
   const handleEmail = (email) => {
     setEmail(email);
-  };
-
-  const handlePassword = (password) => {
-    setPassword(password);
   };
 
   const submitData = () => {
     setIsLoading(true);
     axios
-      .post(`http://192.168.29.198:8000/login/${email}`, { password: password })
+      .post(`http://192.168.29.198:8000/forgotpassword/${email}`)
       .then((res) => {
         if (res) {
           setTimeout(() => {
-            AsyncStorage.setItem("userToken", res.data._id)
-              .then(() => {
-                dispatch(login(res.data));
-                navigation.navigate("Home");
-              })
-              .catch(() => {
-                navigation.navigate("Login");
-              });
             setIsLoading(false);
-            setPassword(null);
             setEmail(null);
+            setIsTextVisible(true);
+            navigation.navigate('Login');
           }, 3000);
         }
       })
-      .catch(() => {
+      .catch((e) => {
         Alert.alert(
-          "Authenticaion Error",
-          "Unable to login. Please try again later.",
+          "Error Occur",
+          `${e.response.data.message}`,
           [
-            {
-              text: "Cancel",
-              onPress: () => navigation.navigate("Login"),
-              style: "cancel",
-            },
-            { text: "OK", onPress: () => navigation.navigate("Login") },
+            { text: "OK", onPress: () => navigation.navigate("ForgotPassword") },
           ]
         );
         setIsLoading(false);
@@ -107,9 +86,9 @@ const ForgotPassword = ({ navigation }) => {
               onChangeText={(val) => handleEmail(val)}
               value={email}
             />
-            {
-                isTextVisible?(<Text style={styles.sentText}>Password sent successfully</Text>):(null)
-            }
+            {isTextVisible ? (
+              <Text style={styles.sentText}>Password sent successfully</Text>
+            ) : null}
             <TouchableOpacity onPress={submitData}>
               {isLoading ? (
                 <Animated.View style={styles.loginButton}>
@@ -181,8 +160,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     color: "#737373",
   },
-  sentText:{
-      color:"#ef5742"
+  sentText: {
+    color: "#ef5742",
   },
   loginButton: {
     width: wp(60),

@@ -20,7 +20,7 @@ import {
 } from "react-native-responsive-screen";
 import BottomBar from "./BottomBar";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faBars, faFilter, faL, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faFilter, faSearch } from "@fortawesome/free-solid-svg-icons";
 import HostelScrollCardHome from "./HostelScrollCardHome";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
