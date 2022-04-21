@@ -13,6 +13,7 @@ import {
   Animated,
   ActivityIndicator,
   Alert,
+  RefreshControl
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -24,6 +25,7 @@ import { faBars, faFilter, faSearch } from "@fortawesome/free-solid-svg-icons";
 import HostelScrollCardHome from "./HostelScrollCardHome";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 const { width, height } = Dimensions.get("window");
 
@@ -38,12 +40,17 @@ const normalize = (size) => {
   }
 };
 
+const wait = (timeout) => {
+  return new Promise(resolve => setTimeout(resolve, timeout));
+}
+
 const HomeScreen = ({ navigation }) => {
+  const [refreshing, setRefreshing] = React.useState(false);
   const [hostel_data, setHostelData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const initialState = useSelector(state => state.loginReducer);
+  const initialState = useSelector((state) => state.loginReducer);
   const hideBottomBarAnim = new Animated.Value(15);
-
+  const dispatch = useDispatch();
   const hideBottomBar = (e) => {
     if (e.nativeEvent.contentOffset.y > 0) {
       Animated.timing(hideBottomBarAnim, {
@@ -63,7 +70,7 @@ const HomeScreen = ({ navigation }) => {
   const hostelData = () => {
     setIsLoading(true);
     axios
-      .get("http://192.168.29.198:8000/hostels")
+      .get("https://hosteldashboards.herokuapp.com/hostel/getAllhostels")
       .then((data) => {
         setHostelData(data.data);
         setIsLoading(false);
@@ -75,10 +82,17 @@ const HomeScreen = ({ navigation }) => {
           [
             {
               text: "Cancel",
-              onPress: () => {setIsLoading(false)},
+              onPress: () => {
+                setIsLoading(false);
+              },
               style: "cancel",
             },
-            { text: "OK", onPress: () => {setIsLoading(false)} },
+            {
+              text: "OK",
+              onPress: () => {
+                setIsLoading(false);
+              },
+            },
           ]
         );
       });
@@ -88,7 +102,11 @@ const HomeScreen = ({ navigation }) => {
     hostelData();
   }, []);
 
-
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    hostelData();
+    wait(2000).then(() => setRefreshing(false));
+  }, []);
 
   return (
     <>
@@ -98,6 +116,13 @@ const HomeScreen = ({ navigation }) => {
           endFillColor="#fcfbfe"
           onScroll={hideBottomBar}
           overScrollMode="never"
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={['#ff8080']}
+            />
+          }
         >
           <View style={styles.header}>
             <TouchableOpacity
@@ -116,7 +141,9 @@ const HomeScreen = ({ navigation }) => {
           <View style={styles.screenBody}>
             <View style={styles.screenBodyTop}>
               <View style={styles.titles}>
-                <Text style={styles.greet}>Hi, {initialState.userData.name}</Text>
+                <Text style={styles.greet}>
+                  Hi, {initialState.userData.name}
+                </Text>
                 <Text style={styles.screenHeading}>
                   Enjoy your Staying with us
                 </Text>
@@ -156,8 +183,10 @@ const HomeScreen = ({ navigation }) => {
                         college_id={val._id}
                         hostel_id={hostels._id}
                         hostel_name={hostels.hostel_name}
-                        location={val.location}
+                        location={hostels.location}
                         price={hostels.room_price}
+                        hostel_image = {hostels.hostel_image}
+                        college_name={val.college_name}
                       />
                     ))
                   )}

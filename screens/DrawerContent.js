@@ -11,8 +11,13 @@ import { DrawerItem } from "@react-navigation/drawer";
 import { Drawer } from "react-native-paper";
 import * as Animatable from "react-native-animatable";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSelector } from "react-redux";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faHome, faSignOut } from "@fortawesome/free-solid-svg-icons";
 
-const DrawerContent = ({ navigation }) => {
+const DrawerContent = ({ props, navigation }) => {
+  const initialState = useSelector((state) => state.loginReducer);
+
   const logout = async () => {
     await AsyncStorage.clear();
     navigation.navigate("Login");
@@ -37,14 +42,15 @@ const DrawerContent = ({ navigation }) => {
           }}
         >
           <Text style={[styles.title, { marginRight: -10 }]}>
-            Manav Bhikadiya
+            {initialState.userData.name}
           </Text>
-          <Text style={styles.caption}>@manavbhikadiya</Text>
+          <Text style={styles.caption}>{initialState.userData.email}</Text>
         </View>
       </View>
       <View style={{ marginTop: 20 }}>
         <Drawer.Section style={styles.drawerSection}>
           <DrawerItem
+            icon={({ color, size }) => <FontAwesomeIcon icon={faHome} />}
             label="Home"
             onPress={() => {
               navigation.navigate("HomeScreen");
@@ -52,7 +58,11 @@ const DrawerContent = ({ navigation }) => {
           />
         </Drawer.Section>
         <Drawer.Section style={styles.bottomDrawerSection}>
-          <DrawerItem label="LogOut" onPress={() => logout()} />
+          <DrawerItem
+            icon={({ color, size }) => <FontAwesomeIcon icon={faSignOut} />}
+            label="LogOut"
+            onPress={() => logout()}
+          />
         </Drawer.Section>
       </View>
     </View>
@@ -61,11 +71,9 @@ const DrawerContent = ({ navigation }) => {
 export default DrawerContent;
 
 const styles = StyleSheet.create({
-  drawerContent: {
+  container: {
     flex: 1,
-  },
-  userInfoSection: {
-    paddingLeft: 25,
+    backgroundColor: "#fff",
   },
   title: {
     fontSize: 16,
@@ -78,19 +86,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 14,
   },
-  row: {
-    marginTop: 12,
-    flexDirection: "row",
-    alignItems: "center",
-  },
   section: {
     flexDirection: "row",
     alignItems: "center",
     marginRight: 15,
-  },
-  paragraph: {
-    fontWeight: "bold",
-    marginRight: 3,
   },
   drawerSection: {
     marginLeft: 0,
@@ -99,32 +98,6 @@ const styles = StyleSheet.create({
   bottomDrawerSection: {
     bottom: 0,
     marginLeft: 0,
-  },
-  preferences: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-  },
-
-  container: {
-    flex: 1,
-    backgroundColor: "#ffcc66",
-  },
-  slider: {
-    height: 125,
-    backgroundColor: "#ffcc66",
-    borderBottomRightRadius: 70,
-  },
-  footer: {
-    flex: 1,
-  },
-  footerContent: {
-    flex: 1,
-    backgroundColor: "#ffcc66",
-    borderTopLeftRadius: 70,
-    // justifyContent:"center",
-    alignItems: "center",
   },
   circle: {
     width: 85,

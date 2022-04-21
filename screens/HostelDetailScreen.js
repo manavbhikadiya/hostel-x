@@ -11,6 +11,8 @@ import {
   Platform,
   TouchableOpacity,
   Animated,
+  Alert,
+  ActivityIndicator
 } from "react-native";
 import { BlurView } from "expo-blur";
 import {
@@ -43,8 +45,8 @@ const normalize = (size) => {
 
 const HostelDetailScreen = ({ route }) => {
   const [hostelDetail, setHostelDetailsData] = useState([]);
-
-  const { college_id, hostel_id } = route.params;
+  const [isLoading, setIsLoading] = useState(true);
+  const { college_id, hostel_id, college_name } = route.params;
 
   const navigation = useNavigation();
   const hideBottomBarAnim = new Animated.Value(15);
@@ -66,15 +68,36 @@ const HostelDetailScreen = ({ route }) => {
   };
 
   const getHostelDetails = () => {
+    setIsLoading(true);
     axios
       .get(
-        `http://192.168.29.198:8000/getHostelDetails/${college_id}/${hostel_id}`
+        `https://hosteldashboards.herokuapp.com/hostel/getHostelDetails/${college_id}/${hostel_id}`
       )
       .then((data) => {
         setHostelDetailsData(data.data);
+        setIsLoading(false);
       })
       .catch(() => {
-        console.log("Error occur");
+        Alert.alert(
+          "Error occur",
+          "Response timed out. Check your internet connection",
+          [
+            {
+              text: "Cancel",
+              onPress: () => {
+                setIsLoading(false);
+              },
+              style: "cancel",
+            },
+            {
+              text: "OK",
+              onPress: () => {
+                setIsLoading(false);
+              },
+            },
+          ]
+        );
+        setIsLoading(false);
       });
   };
 
@@ -89,6 +112,7 @@ const HostelDetailScreen = ({ route }) => {
       longitude: longitude,
       hostel_name: hostel_name,
       kms: kms,
+      college_name: college_name
     });
   };
 
@@ -96,101 +120,110 @@ const HostelDetailScreen = ({ route }) => {
     <>
       <View style={styles.detailsScreenContainer}>
         <BottomBar anim={hideBottomBarAnim} />
-        <ScrollView
-          endFillColor="#fcfbfe"
-          overScrollMode="never"
-          showsVerticalScrollIndicator={false}
-          onScroll={hideBottomBar}
-        >
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButtoncontainer}
+        {isLoading ? (
+          <View style={styles.loaderContainer}>
+            <ActivityIndicator color="#ef5742" size={40} />
+          </View>
+        ) : (
+          <ScrollView
+            endFillColor="#fcfbfe"
+            overScrollMode="never"
+            showsVerticalScrollIndicator={false}
+            onScroll={hideBottomBar}
           >
-            <FontAwesomeIcon
-              style={styles.backIcon}
-              icon={faAngleLeft}
-              size={24}
-            />
-          </TouchableOpacity>
-          <View style={styles.hostelImageContainer}>
-            <View style={styles.hostelImage}>
-              <ImageBackground
-                style={styles.hImage}
-                imageStyle={{ borderRadius: 20 }}
-                source={require("../assets/hostel_1.jpg")}
-              >
-                <BlurView intensity={100} style={styles.hostelDescription}>
-                  <Text style={styles.hostelName}>
-                    {hostelDetail.hostel_name}
-                  </Text>
-                  <Text style={styles.hostelLocation}>
-                    Santorini Island, Greece
-                  </Text>
-                  <Text style={styles.price}>
-                    {hostelDetail.room_price}/year
-                  </Text>
-                  <View style={styles.heartContainer}>
-                    <FontAwesomeIcon style={styles.heartIcon} icon={faHeart} />
-                  </View>
-                </BlurView>
-              </ImageBackground>
-            </View>
-          </View>
-          <View style={styles.NearByViewAll}>
-            <Text style={styles.nearByText}>About</Text>
-          </View>
-          <View style={styles.aboutContainer}>
-            <Text style={styles.aboutText}>
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum is simply dummy text of the printing and
-              typesetting industry.
-            </Text>
-          </View>
-          <View style={styles.NearByViewAll}>
-            <Text style={styles.nearByText}>Description</Text>
-          </View>
-          <View style={styles.facilityMainContainer}>
-            <View style={styles.facilityContainer}>
-              <View style={styles.facilityIcon}>
-                <FontAwesomeIcon style={styles.menuIcon} icon={faHome} />
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.backButtoncontainer}
+            >
+              <FontAwesomeIcon
+                style={styles.backIcon}
+                icon={faAngleLeft}
+                size={24}
+              />
+            </TouchableOpacity>
+            <View style={styles.hostelImageContainer}>
+              <View style={styles.hostelImage}>
+                <ImageBackground
+                  style={styles.hImage}
+                  imageStyle={{ borderRadius: 20 }}
+                  source={{uri: hostelDetail.hostel_image}}
+                >
+                  <BlurView intensity={100} style={styles.hostelDescription}>
+                    <Text style={styles.hostelName}>
+                      {hostelDetail.hostel_name}
+                    </Text>
+                    <Text style={styles.hostelLocation}>
+                     {hostelDetail.location}
+                    </Text>
+                    <Text style={styles.price}>
+                      {hostelDetail.room_price}/year
+                    </Text>
+                    <View style={styles.heartContainer}>
+                      <FontAwesomeIcon
+                        style={styles.heartIcon}
+                        icon={faHeart}
+                      />
+                    </View>
+                  </BlurView>
+                </ImageBackground>
               </View>
-              <Text style={styles.facilityText}>
-                {hostelDetail.rooms_available} Rooms available
+            </View>
+            <View style={styles.NearByViewAll}>
+              <Text style={styles.nearByText}>About</Text>
+            </View>
+            <View style={styles.aboutContainer}>
+              <Text style={styles.aboutText}>
+                {hostelDetail.description}
               </Text>
             </View>
-            <View style={styles.facilityContainer}>
-              <View style={styles.facilityIcon}>
-                <FontAwesomeIcon style={styles.menuIcon} icon={faUserGroup} />
-              </View>
-              {hostelDetail.boys && hostelDetail.girls ? (
-                <Text style={styles.facilityText}>Boy's and Girl's Hostel</Text>
-              ) : hostelDetail.girls ? (
-                <Text style={styles.facilityText}>Girl's Hostel</Text>
-              ) : (
-                <Text style={styles.facilityText}>Boy's Hostel</Text>
-              )}
+            <View style={styles.NearByViewAll}>
+              <Text style={styles.nearByText}>Description</Text>
             </View>
-          </View>
-          <View style={styles.mapBookButtonContainer}>
-            <TouchableOpacity
-              style={styles.mapButton}
-              onPress={() =>
-                gotoMap(
-                  hostelDetail._id,
-                  hostelDetail.latitude,
-                  hostelDetail.longitude,
-                  hostelDetail.hostel_name,
-                  hostelDetail.kms
-                )
-              }
-            >
-              <Text style={styles.mapText}>View on Map</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.BookButton}>
-              <Text style={styles.bookText}>Book now</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
+            <View style={styles.facilityMainContainer}>
+              <View style={styles.facilityContainer}>
+                <View style={styles.facilityIcon}>
+                  <FontAwesomeIcon style={styles.menuIcon} icon={faHome} />
+                </View>
+                <Text style={styles.facilityText}>
+                  {hostelDetail.rooms_available} Rooms available
+                </Text>
+              </View>
+              <View style={styles.facilityContainer}>
+                <View style={styles.facilityIcon}>
+                  <FontAwesomeIcon style={styles.menuIcon} icon={faUserGroup} />
+                </View>
+                {hostelDetail.boys && hostelDetail.girls ? (
+                  <Text style={styles.facilityText}>
+                    Boy's and Girl's Hostel
+                  </Text>
+                ) : hostelDetail.girls ? (
+                  <Text style={styles.facilityText}>Girl's Hostel</Text>
+                ) : (
+                  <Text style={styles.facilityText}>Boy's Hostel</Text>
+                )}
+              </View>
+            </View>
+            <View style={styles.mapBookButtonContainer}>
+              <TouchableOpacity
+                style={styles.mapButton}
+                onPress={() =>
+                  gotoMap(
+                    hostelDetail._id,
+                    hostelDetail.latitude,
+                    hostelDetail.longitude,
+                    hostelDetail.hostel_name,
+                    hostelDetail.kms
+                  )
+                }
+              >
+                <Text style={styles.mapText}>View on Map</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.BookButton}>
+                <Text style={styles.bookText}>Book now</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        )}
       </View>
     </>
   );
@@ -202,6 +235,11 @@ const styles = StyleSheet.create({
     flex: 1,
     // backgroundColor: "red",
     paddingTop: 50,
+  },
+  loaderContainer:{
+    flex:1,
+    justifyContent:"center",
+    alignItems:"center"
   },
   backButtoncontainer: {
     // backgroundColor:"red",

@@ -19,7 +19,7 @@ const { width, height } = Dimensions.get("window");
 import { faLocationDot, faHeart } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import BottomBar from "./BottomBar";
-import { color } from "react-native/Libraries/Components/View/ReactNativeStyleAttributes";
+
 
 const scale = width / 320;
 
@@ -33,8 +33,8 @@ const normalize = (size) => {
 };
 
 const MapScreen = ({ route }) => {
-  const { hostel_id, latitude, longitude, hostel_name, kms } = route.params;
-
+  const { hostel_id, latitude, longitude, hostel_name, kms, college_name } = route.params;
+  console.log(latitude,longitude);
   const hideBottomBarAnim = new Animated.Value(15);
 
   const hideBottomBar = (e) => {
@@ -90,7 +90,7 @@ const MapScreen = ({ route }) => {
                 <MapView.Marker
                   coordinate={{ latitude: latitude, longitude: longitude }}
                   title={hostel_name}
-                  description={`${kms} Km from ${hostel_name}`}
+                  description={`${kms} Km from ${college_name}`}
                 >
                   <View style={styles.markerIcon}>
                     <FontAwesomeIcon
@@ -122,7 +122,7 @@ const MapScreen = ({ route }) => {
               ) : (
                 <View style={styles.kmsContainer}>
                   <Text style={styles.kmsText}>{kms} km</Text>
-                  <Text style={styles.fromText}> From {hostel_name}</Text>
+                  <Text style={styles.fromText}> From {college_name}</Text>
                 </View>
               )}
               <View style={styles.bookButton}>

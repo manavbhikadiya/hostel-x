@@ -37,6 +37,7 @@ const HostelScrollCardHome = (props) => {
     navigation.navigate("Details", {
       college_id: props.college_id,
       hostel_id: props.hostel_id,
+      college_name: props.college_name,
     });
   };
 
@@ -46,7 +47,7 @@ const HostelScrollCardHome = (props) => {
         <View style={styles.hostelImageContainer}>
           <Image
             style={styles.hostelImage}
-            source={require("../assets/hostel_1.jpg")}
+            source={{uri: props.hostel_image}}
           />
           <View style={styles.heartContainer}>
           <FontAwesomeIcon

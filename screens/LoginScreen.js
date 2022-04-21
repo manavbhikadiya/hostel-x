@@ -55,7 +55,7 @@ const LoginScreen = ({ navigation }) => {
   const submitData = () => {
     setIsLoading(true);
     axios
-      .post(`http://192.168.29.198:8000/login/${email}`, { password: password })
+      .post(`https://hosteldashboards.herokuapp.com/user/loginUser/${email}`, { password: password })
       .then((res) => {
         if (res) {
           setTimeout(() => {

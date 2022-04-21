@@ -64,7 +64,7 @@ const SignUpScreen = ({ navigation }) => {
   const submitData = () => {
     setIsLoading(true);
     axios
-      .post(`http://192.168.29.198:8000/user`, {
+      .post(`https://hosteldashboards.herokuapp.com/user`, {
         name: username,
         email: email,
         password: password,
