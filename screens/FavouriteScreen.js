@@ -10,6 +10,7 @@ import {
   Platform,
   TouchableOpacity,
   Animated,
+  ActivityIndicator,
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -37,6 +38,7 @@ const normalize = (size) => {
 
 const FavouriteScreen = ({ navigation }) => {
   const [hostel_data, setHostelData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const initialState = useSelector((state) => state.loginReducer);
 
   const hideBottomBarAnim = new Animated.Value(15);
@@ -58,18 +60,20 @@ const FavouriteScreen = ({ navigation }) => {
   };
 
   const getFavouriteHostel = () => {
+    setIsLoading(true);
     axios
       .get(
-        `http://192.168.29.198:8000/getFavouritehostel/${initialState.userData._id}`
+        `https://hosteldashboards.herokuapp.com/hostel/getFavouriteHostels/626105b7d617fb1a97addd12`
       )
       .then((data) => {
         setHostelData(data.data);
+        setIsLoading(false);
       })
       .catch(() => {
         console.log("Error occur");
+        setIsLoading(false);
       });
   };
-  console.log("*************", hostel_data);
   useEffect(() => {
     getFavouriteHostel();
   }, []);
@@ -89,25 +93,41 @@ const FavouriteScreen = ({ navigation }) => {
               onScroll={hideBottomBar}
               showsVerticalScrollIndicator={false}
             >
-              {hostel_data.map((val) =>
-                val.hostels.map((hostels, index) => (
-                  <LikescreenCard
-                    key={index}
-                    college_id={val._id}
-                    hostel_id={hostels._id}
-                    hostel_name={hostels.hostel_name}
-                    price={hostels.room_price}
-                    rooms_available={hostels.rooms_available}
-                  />
-                ))
+              {isLoading ? (
+                <ActivityIndicator color="#ef5742" size={40} />
+              ) : (
+                <>
+                  {hostel_data.map((val, index) => (
+                    <LikescreenCard
+                      key={index}
+                      college_id={val._id}
+                      hostel_id={val._id}
+                      hostel_name={val.hostel_name}
+                      price={val.room_price}
+                      rooms_available={val.rooms_available}
+                    />
+                  ))}
+                </>
               )}
             </ScrollView>
           ) : (
             <View style={styles.nothingContainer}>
-              <Image source={require("../assets/houseSearch.png")} style={styles.searchImage} />
-              <TouchableOpacity style={styles.newSearchButton} onPress={()=>navigation.navigate('Home')} >
-                <Text style={styles.newSearchText}>Start new search</Text>
-              </TouchableOpacity>
+              {isLoading ? (
+                <ActivityIndicator color="#ef5742" size={40} />
+              ) : (
+                <>
+                  <Image
+                    source={require("../assets/houseSearch.png")}
+                    style={styles.searchImage}
+                  />
+                  <TouchableOpacity
+                    style={styles.newSearchButton}
+                    onPress={() => navigation.navigate("Home")}
+                  >
+                    <Text style={styles.newSearchText}>Start new search</Text>
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
           )}
         </View>
@@ -156,15 +176,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,
-    marginTop:8
+    marginTop: 8,
   },
   newSearchText: {
     fontSize: normalize(14),
     fontWeight: "bold",
     color: "#fff",
   },
-  searchImage:{
-    width:150,
-    height:100,
-  }
+  searchImage: {
+    width: 150,
+    height: 100,
+  },
 });

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -10,12 +10,13 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faLocationDot,faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faLocationDot, faHeart } from "@fortawesome/free-solid-svg-icons";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 
 const { width, height } = Dimensions.get("window");
 
@@ -32,6 +33,7 @@ const normalize = (size) => {
 
 const HostelScrollCardHome = (props) => {
   const navigation = useNavigation();
+  const [heartColor,setHeartColor] = useState('#000');
 
   const goDetail = () => {
     navigation.navigate("Details", {
@@ -41,19 +43,33 @@ const HostelScrollCardHome = (props) => {
     });
   };
 
+  const addFavourites = (hostelId) => {
+    setIsLoading(true);
+    axios
+      .post(
+        `https://hosteldashboards.herokuapp.com/user/addFavourite/626105b7d617fb1a97addd12/${hostelId}`
+      )
+      .then((res) => {
+        setHeartColor('red');
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
   return (
     <>
       <TouchableOpacity style={styles.hostelCard} onPress={() => goDetail()}>
         <View style={styles.hostelImageContainer}>
           <Image
             style={styles.hostelImage}
-            source={{uri: props.hostel_image}}
+            source={{ uri: props.hostel_image }}
           />
+
           <View style={styles.heartContainer}>
-          <FontAwesomeIcon
-                style={styles.heartImage}
-                icon={faHeart}
-              />
+            <TouchableOpacity onPress={()=>addFavourites(props.hostel_id)}>
+              <FontAwesomeIcon icon={faHeart} color={heartColor}/>
+            </TouchableOpacity>
           </View>
         </View>
         <View style={styles.hostelDescription}>
@@ -136,9 +152,6 @@ const styles = StyleSheet.create({
   },
   locationImage: {
     color: "#ef5742",
-  },
-  heartImage:{
-    color: "#000"
   },
   locationText: {
     color: "#bfbfbf",
